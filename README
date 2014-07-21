@@ -1,1 +1,8 @@
 Blackjack via APIs
+
+Requiremnets:
+- Install Flask
+    pip install flask
+
+Running the project:
+    python app.py
