@@ -1,5 +1,5 @@
 NUMBER_CHOICES = (
-    "Ace",
+    "ACE",
     "2",
     "3",
     "4",
@@ -9,9 +9,9 @@ NUMBER_CHOICES = (
     "8",
     "9",
     "10",
-    "Jack",
-    "Queen",
-    "King",
+    "JACK",
+    "QUEEN",
+    "KING",
 )
 
 SUIT_CHOICES = (
