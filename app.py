@@ -2,8 +2,11 @@
 from flask import Flask
 from flask import jsonify
 
-from constants import SECRET_KEY
 from api_exceptions import ApplicationError
+from constants import SECRET_KEY
+from deck import Card
+from deck import Deck
+from deck import Hand
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -24,8 +27,27 @@ def deal():
 
     TODO: Splitting cards, double down and insurance are not a feature yet
     """
-    return "Hello World!"
+    deck = Deck()
+    deck.shuffle()
+    player_hand = Hand()
+    dealer_hand = Hand()
 
+    player_hand.add_card(deck.pick())
+    dealer_hand.add_card(deck.pick())
+    player_hand.add_card(deck.pick())
+    dealer_hand.add_card(deck.pick())
+
+    data = {
+        "winner": None,
+        "player_hand": player_hand.to_dict(),
+        "dealer_hand": dealer_hand.to_dict(dealer_hand=True)
+    }
+
+    if player_hand.is_blackjack:
+        data["winner"] = "player"
+    if dealer_hand.is_blackjack:
+        data["winner"] = "dealer"
+    return jsonify(data)
 
 @app.route("/hit")
 def hit():
@@ -66,4 +88,5 @@ def handle_application_error(error):
     return response
 
 if __name__ == "__main__":
+    app.debug = True
     app.run()
