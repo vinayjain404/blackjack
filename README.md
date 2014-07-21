@@ -5,11 +5,12 @@
 ### Requiremnets:
 
 1. Python Flask Web Framework (http://flask.pocoo.org/)
-    ```
-    pip install flask
-    ```
+
+```
+pip install flask
+```
 
 ### Running the project:
-    ```
-    python app.py
-    ```
+```
+python app.py
+```
