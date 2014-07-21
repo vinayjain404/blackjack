@@ -1,5 +1,7 @@
 # Module to represent a deck of cards
 
+import random
+
 from constants import NUMBER_CHOICES
 from constants import SUIT_CHOICES
 
@@ -10,11 +12,11 @@ class Card(object):
     def __init__(self, number, suit):
         # Perform some validation on the Card object
         if number not in NUMBER_CHOICES:
-            raise Exception("Invalid number choice must be one from the
-                             following choices: %s", str(NUMBER_CHOICES)
+            raise Exception("Invalid number choice must be one from the"
+                            "following choices: %s", str(NUMBER_CHOICES))
         if suit not in SUIT_CHOICES:
-            raise Exception("Invalid suit choice must be one from the following
-                             choices: %s", str(SUIT_CHOICES))
+            raise Exception("Invalid suit choice must be one from the following"
+                            "choices: %s", str(SUIT_CHOICES))
 
         self.number = number
         self.suit = suit
@@ -27,13 +29,13 @@ class Card(object):
         elif self.number in ("JACK, QUEEN, KING"):
             return 10
         else:
-            return self.number
+            return int(self.number)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s of %s" %(self.number, self.suit)
 
 
-class Deck(List):
+class Deck(list):
     """Class representing a Deck which is a collection of Cards"""
 
     def __init__(self):
@@ -61,3 +63,26 @@ class Deck(List):
     def cards_left(self):
         """Count of cards left in the deck"""
         return len(self)
+
+class Hand(list):
+
+    def add_card(self, card):
+        self.append(card)
+
+    def __cmp__(self, other):
+        """Override the compare operator to compare hands"""
+        return self.value > other.value
+
+    @property
+    def value(self):
+        return sum([card.blackjack_value for card in self])
+
+    @property
+    def is_blackjack(self):
+        return self.value == 21
+
+    def to_dict(self, dealer_hand=False):
+        cards = [str(card) for card in self]
+        if dealer_hand:
+            cards[1] = "X"
+        return cards
