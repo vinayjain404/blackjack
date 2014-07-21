@@ -2,10 +2,14 @@
 
 ## Blackjack via APIs
 
-## Requiremnets:
+### Requiremnets:
 
-1.Python Flask Web Framework (http://flask.pocoo.org/)
-    `pip install flask`
+1. Python Flask Web Framework (http://flask.pocoo.org/)
+    ```
+    pip install flask
+    ```
 
 ### Running the project:
-    `python app.py`
+    ```
+    python app.py
+    ```
