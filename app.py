@@ -8,6 +8,7 @@ from constants import SECRET_KEY
 from deck import Card
 from deck import Deck
 from deck import Hand
+from decorators import require_incomplete_game
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -28,7 +29,7 @@ def deal():
 
     TODO: Splitting cards, double down and insurance are not a feature yet
     """
-    deck = Deck()
+    deck = Deck(initial=True)
     deck.shuffle()
     player_hand = Hand()
     dealer_hand = Hand()
@@ -44,19 +45,26 @@ def deal():
         "dealer_hand": dealer_hand,
     }
 
+    # TODO handle corner case of both dealer and player having blackjacks
     if player_hand.is_blackjack:
         data["winner"] = "player"
-    if dealer_hand.is_blackjack:
+    elif dealer_hand.is_blackjack:
         data["winner"] = "dealer"
 
+    # Clear any previously stored sessions
+    session.clear()
+
     # Store state of deck and hands in session
-    session['winner'] = data['winner']
+    session['deck'] = deck
     session['dealer_hand'] = dealer_hand
     session['player_hand'] = player_hand
+    session['winner'] = data['winner']
 
     return jsonify(data)
 
+
 @app.route("/hit")
+@require_incomplete_game
 def hit():
     """API endpoint for fetching a card via a human.
 
@@ -65,10 +73,34 @@ def hit():
     - If the score is >21 then computer wins, =21 human wins else continue the
     game
     """
-    return "Hello World!"
+    # Fetch state from session
+    deck = Deck(session.get("deck"))
+    player_hand = Hand(session.get("player_hand"))
+    dealer_hand = Hand(session.get("dealer_hand"))
+
+    player_hand.add_card(deck.pick())
+
+    data = {
+        "winner": None,
+        "player_hand": player_hand,
+        "dealer_hand": dealer_hand,
+    }
+
+    if player_hand.is_blackjack:
+        data["winner"] = "player"
+    elif player_hand.is_busted:
+        data["winner"] = "dealer"
+
+    # Store state of deck and hands in session
+    session['deck'] = deck
+    session['dealer_hand'] = dealer_hand
+    session['player_hand'] = player_hand
+    session['winner'] = data['winner']
+    return jsonify(data)
 
 
 @app.route("/stand")
+@require_incomplete_game
 def stand():
     """API endpoint for stopping fetching cards for a human.
 
@@ -78,7 +110,36 @@ def stand():
     - If the score is >21 then human wins, =21 computer wins, human and computer
     score is the same then its a push
     """
-    return "Hello World!"
+    # Fetch state from session
+    deck = Deck(session.get("deck"))
+    dealer_hand = Hand(session.get("dealer_hand"))
+    player_hand = Hand(session.get("player_hand"))
+
+    data = {
+        "winner": None,
+        "player_hand": player_hand,
+        "dealer_hand": dealer_hand,
+    }
+
+    while dealer_hand.should_play:
+        dealer_hand.add_card(deck.pick())
+
+    if dealer_hand.is_busted:
+        data["winner"] = "player"
+    elif dealer_hand == player_hand:
+        data["winner"] = "push"
+    elif dealer_hand < player_hand:
+        data["winner"] = "player"
+    else:
+        data["winner"] = "dealer"
+
+    # Store state of deck and hands in session
+    session['deck'] = deck
+    session['dealer_hand'] = dealer_hand
+    session['player_hand'] = player_hand
+    session['winner'] = data['winner']
+
+    return jsonify(data)
 
 
 @app.route("/cards")
