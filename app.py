@@ -54,8 +54,6 @@ def deal():
     session['dealer_hand'] = dealer_hand
     session['player_hand'] = player_hand
 
-    print player_hand
-
     return jsonify(data)
 
 @app.route("/hit")
@@ -67,7 +65,6 @@ def hit():
     - If the score is >21 then computer wins, =21 human wins else continue the
     game
     """
-
     return "Hello World!"
 
 
