@@ -1,6 +1,7 @@
 # Blackjack application
 from flask import Flask
 from flask import jsonify
+from flask import session
 
 from api_exceptions import ApplicationError
 from constants import SECRET_KEY
@@ -39,14 +40,22 @@ def deal():
 
     data = {
         "winner": None,
-        "player_hand": player_hand.to_dict(),
-        "dealer_hand": dealer_hand.to_dict(dealer_hand=True)
+        "player_hand": player_hand,
+        "dealer_hand": dealer_hand,
     }
 
     if player_hand.is_blackjack:
         data["winner"] = "player"
     if dealer_hand.is_blackjack:
         data["winner"] = "dealer"
+
+    # Store state of deck and hands in session
+    session['winner'] = data['winner']
+    session['dealer_hand'] = dealer_hand
+    session['player_hand'] = player_hand
+
+    print player_hand
+
     return jsonify(data)
 
 @app.route("/hit")
@@ -77,8 +86,17 @@ def stand():
 
 @app.route("/cards")
 def cards():
-    """API to show all the cards for the human"""
-    return "Hello World!"
+    """API to show all the cards for the game and result"""
+    player_hand = session.get("player_hand")
+    dealer_hand = session.get("dealer_hand")
+    winner = session.get("winner")
+
+    data = {
+        "player_hand": player_hand,
+        "dealer_hand": dealer_hand,
+        "winner": winner,
+    }
+    return jsonify(data)
 
 
 @app.errorhandler(ApplicationError)

@@ -6,7 +6,7 @@ from constants import NUMBER_CHOICES
 from constants import SUIT_CHOICES
 
 
-class Card(object):
+class Card(dict):
     """Class representing a Card"""
 
     def __init__(self, number, suit):
@@ -18,8 +18,8 @@ class Card(object):
             raise Exception("Invalid suit choice must be one from the following"
                             "choices: %s", str(SUIT_CHOICES))
 
-        self.number = number
-        self.suit = suit
+        self['number'] = number
+        self['suit'] = suit
 
     @property
     def blackjack_value(self):
@@ -30,6 +30,9 @@ class Card(object):
             return 10
         else:
             return int(self.number)
+
+    def __getattr__(self, attr):
+        return self.get(attr)
 
     def __str__(self):
         return "%s of %s" %(self.number, self.suit)
@@ -80,9 +83,3 @@ class Hand(list):
     @property
     def is_blackjack(self):
         return self.value == 21
-
-    def to_dict(self, dealer_hand=False):
-        cards = [str(card) for card in self]
-        if dealer_hand:
-            cards[1] = "X"
-        return cards
