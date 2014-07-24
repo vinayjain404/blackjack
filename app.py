@@ -29,6 +29,7 @@ def deal():
 
     TODO: Splitting cards, double down and insurance are not a feature yet
     """
+    # Initialize the deck and the hands for player and dealer
     deck = Deck(initial=True)
     deck.shuffle()
     player_hand = Hand()
@@ -39,6 +40,7 @@ def deal():
     player_hand.add_card(deck.pick())
     dealer_hand.add_card(deck.pick())
 
+    # TODO vinayjain Move the response data to a serializer that can be reused
     data = {
         "winner": None,
         "player_hand": player_hand,
@@ -121,9 +123,11 @@ def stand():
         "dealer_hand": dealer_hand,
     }
 
+    # Fetch cards until the dealer hits atleast 17
     while dealer_hand.should_play:
         dealer_hand.add_card(deck.pick())
 
+    # Business logic to compute winner based on the final scores
     if dealer_hand.is_busted:
         data["winner"] = "player"
     elif dealer_hand == player_hand:
@@ -144,7 +148,7 @@ def stand():
 
 @app.route("/cards")
 def cards():
-    """API to show all the cards for the game and result"""
+    """API to show all the cards for the game and the current result"""
     player_hand = session.get("player_hand")
     dealer_hand = session.get("dealer_hand")
     winner = session.get("winner")
