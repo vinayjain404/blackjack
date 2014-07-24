@@ -16,10 +16,10 @@ python app.py
 ```
 
 ### How to Play
-1. Access the API /deal to start the game
-2. If the player wants to hit looking at the game then call the /hit API
-3. If the player wants to stand call the /stand API
-4. To see the current state of the game call the /cards API
+1. Access the API `/deal` to start the game
+2. If the player wants to hit looking at the game then call the `/hit` API
+3. If the player wants to stand call the `/stand` API
+4. To see the current state of the game call the `/cards` API
 
 ### Features
 1. Session based game
